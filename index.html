@@ -1,47 +1,941 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Welcome to Vercel</title>
-	<!-- Bootstrap CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<style>
-		body {
-			background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-		.welcome-card {
-			box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-			border-radius: 1.5rem;
-			padding: 2.5rem 2rem;
-			background: #fff;
-			text-align: center;
-		}
-		.vercel-logo {
-			width: 64px;
-			margin-bottom: 1rem;
-		}
-	</style>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Kitchen Design Studio</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --glass-bg: rgba(8, 8, 12, 0.92);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-shadow: 0 20px 64px rgba(0, 0, 0, 0.8);
+      --surface-primary: rgba(12, 12, 16, 0.95);
+      --surface-secondary: rgba(18, 18, 24, 0.9);
+      --accent-primary: #ffffff;
+      --accent-secondary: #f5f5f7;
+      --accent-muted: #8e8e93;
+      --text-primary: #ffffff;
+      --text-secondary: #d1d1d6;
+      --text-tertiary: #8e8e93;
+      --border-primary: rgba(255, 255, 255, 0.12);
+      --border-secondary: rgba(255, 255, 255, 0.06);
+      --backdrop-blur: blur(40px);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Light theme overrides */
+    body.light-theme {
+      --glass-bg: rgba(255, 255, 255, 0.86);
+      --glass-border: rgba(16, 18, 20, 0.06);
+      --glass-shadow: 0 20px 64px rgba(12, 14, 18, 0.06);
+      --surface-primary: rgba(250, 250, 250, 0.98);
+      --surface-secondary: rgba(245, 245, 247, 0.95);
+      --accent-primary: #0b1220;
+      --accent-secondary: #111827;
+      --accent-muted: #6b7280;
+      --text-primary: #0b1220;
+      --text-secondary: #374151;
+      --text-tertiary: #6b7280;
+      --border-primary: rgba(11, 18, 32, 0.06);
+      --border-secondary: rgba(11, 18, 32, 0.03);
+      --backdrop-blur: blur(8px);
+      background: linear-gradient(135deg, #fbfdff 0%, #f6f8fa 100%);
+    }
+
+    body.light-theme .viewer-container {
+      box-shadow: 0 12px 36px rgba(15, 20, 30, 0.06);
+    }
+
+    body.light-theme .viewer-header {
+      background: var(--surface-primary);
+      border-bottom: 1px solid var(--border-secondary);
+    }
+
+    body.light-theme .color-palette.bottom-center {
+      box-shadow: 0 8px 28px rgba(8, 10, 12, 0.06);
+    }
+
+    body.light-theme .texture-btn {
+      color: var(--text-secondary);
+    }
+
+    body.light-theme .texture-btn.active {
+      background: rgba(11, 18, 32, 0.06);
+      color: var(--text-primary);
+    }
+
+    /* Smooth transition when toggling theme */
+    html,
+    body,
+    .viewer-container,
+    .palette-inner,
+    .texture-btn {
+      transition: background 240ms ease, color 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+    }
+
+    /* ---------- original full CSS (unchanged) ---------- */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 0 20px;
+    }
+
+    .header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin: 0;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .viewer-container {
+      position: relative;
+      /* ensure absolute children position relative to this */
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
+      height: 600px;
+      margin-bottom: 20px;
+    }
+
+    .viewer-container.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 9999;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    .viewer-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--surface-primary);
+      border-bottom: 1px solid var(--border-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 200;
+    }
+
+    .viewer-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-btn {
+      background: transparent;
+      border: none;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: var(--transition);
+      font-size: 16px;
+      touch-action: manipulation;
+    }
+
+    .control-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+
+    .fullscreen-btn {
+      font-size: 18px;
+    }
+
+    #threejs-container {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000000;
+    }
+
+    #loader {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.6s ease-out;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid #ffffff;
+      border-radius: 50%;
+      margin-bottom: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 20px;
+      letter-spacing: 0.2px;
+    }
+
+    .progress-container {
+      width: 240px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #ffffff;
+      width: 0%;
+      transition: width 0.3s ease-out;
+      border-radius: 1px;
+    }
+
+    .fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Touch feedback */
+    .touch-feedback {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translate(-50%, -50%) scale(0);
+      animation: touchRipple 0.3s ease-out;
+      z-index: 1000;
+    }
+
+    @keyframes touchRipple {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Professional Control Panel */
+    #textureSelector {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      width: 280px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      z-index: 100;
+      transition: var(--transition);
+      max-height: calc(100vh - 200px);
+      overflow: hidden;
+    }
+
+    #textureSelector.collapsed {
+      width: 48px;
+      height: 48px;
+    }
+
+    #textureSelector.collapsed .selector-content {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #textureSelector.collapsed .selector-title {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .selector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-secondary);
+      background: var(--surface-primary);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .selector-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: var(--transition);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 500;
+      touch-action: manipulation;
+    }
+
+    .toggle-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .toggle-btn:active {
+      transform: scale(0.95);
+    }
+
+    .selector-content {
+      padding: 0;
+      transition: var(--transition);
+      max-height: calc(100vh - 300px);
+      overflow-y: auto;
+    }
+
+    .category {
+      border-bottom: 1px solid var(--border-secondary);
+    }
+
+    .category:last-child {
+      border-bottom: none;
+    }
+
+    .category-header {
+      padding: 16px 20px;
+      background: var(--surface-secondary);
+      border-bottom: 1px solid var(--border-secondary);
+    }
+
+    .category-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .texture-grid {
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .texture-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 8px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      border-radius: 6px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      touch-action: manipulation;
+    }
+
+    .texture-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+
+    .texture-btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(0.98);
+    }
+
+    .texture-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .texture-btn.active::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 4px;
+      height: 4px;
+      background: #ffffff;
+      border-radius: 50%;
+    }
+
+    /* Status indicator */
+    .status-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border-radius: 8px;
+      padding: 12px 16px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      padding: 24px;
+      transition: var(--transition);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .header p {
+        font-size: 1rem;
+      }
+
+      .viewer-container {
+        height: 400px;
+      }
+
+      #textureSelector {
+        top: 72px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        max-width: none;
+        border-radius: 8px;
+        max-height: calc(100vh - 100px);
+      }
+
+      #textureSelector.collapsed {
+        width: 44px;
+        height: 44px;
+        left: auto;
+        right: 12px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .feature-card {
+        padding: 20px;
+      }
+
+      .viewer-header {
+        height: 50px;
+        padding: 0 16px;
+      }
+
+      #threejs-container {
+        top: 50px;
+      }
+
+      #loader {
+        top: 50px;
+      }
+    }
+
+    /* Fullscreen mode adjustments */
+    .viewer-container.fullscreen #textureSelector {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      left: auto;
+      width: 280px;
+      z-index: 10000;
+    }
+
+    .viewer-container.fullscreen .status-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10000;
+    }
+
+    @media (max-width: 768px) {
+      .viewer-container.fullscreen #textureSelector {
+        top: 60px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+      }
+
+      .viewer-container.fullscreen #textureSelector.collapsed {
+        width: 44px;
+        left: auto;
+        right: 12px;
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus states for keyboard navigation */
+    .texture-btn:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: -2px;
+    }
+
+    .toggle-btn:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: -2px;
+    }
+
+    .control-btn:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: -2px;
+    }
+
+    /* =========================
+   Bottom-Centered Liquid Glass Palette (viewer-attached)
+   ========================= */
+    .color-palette.bottom-center {
+      position: absolute;
+      /* positioned relative to .viewer-container */
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      z-index: 12000;
+      width: min(92vw, 820px);
+      max-width: 100%;
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(2, 6, 12, 0.75), 0 2px 8px rgba(0, 0, 0, 0.35);
+      transition: width 260ms ease, left 260ms ease, transform 260ms ease;
+      pointer-events: auto;
+    }
+
+    /* When viewer is fullscreen, make palette fixed to viewport */
+    .viewer-container.fullscreen .color-palette.bottom-center {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+    }
+
+    /* Liquid animated background */
+    .color-palette.bottom-center .liquid-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      z-index: 1;
+      filter: blur(28px) saturate(140%);
+      opacity: 0.86;
+      pointer-events: none;
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0.05) 0%,
+          rgba(200, 150, 100, 0.10) 30%,
+          rgba(80, 90, 120, 0.07) 60%,
+          rgba(255, 255, 255, 0.03) 100%);
+      background-size: 300% 300%;
+      animation: liquidFlow 12s ease-in-out infinite;
+    }
+
+    /* Glass inner container */
+    .color-palette.bottom-center .palette-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      border-radius: 14px;
+      padding: 10px 14px;
+      background: linear-gradient(180deg, rgba(20, 22, 25, 0.56), rgba(18, 18, 22, 0.4));
+      backdrop-filter: blur(16px) saturate(150%) contrast(115%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%) contrast(115%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    /* highlight */
+    .color-palette.bottom-center .palette-inner::before {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 5%;
+      height: 14%;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Swatches row */
+    .palette-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding: 6px 6px;
+      align-items: center;
+      scroll-behavior: smooth;
+    }
+
+    /* Scrollbar styling */
+    .palette-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .palette-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+    }
+
+    /* Each swatch */
+    .color-swatch {
+      --size: 52px;
+      width: var(--size);
+      height: var(--size);
+      flex: 0 0 auto;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 18px rgba(2, 6, 10, 0.6), inset 0 -6px 12px rgba(0, 0, 0, 0.4);
+      position: relative;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .color-swatch::after {
+      content: "";
+      position: absolute;
+      left: 12%;
+      top: 8%;
+      width: 76%;
+      height: 38%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.02));
+      pointer-events: none;
+    }
+
+    .color-swatch:hover,
+    .color-swatch:focus {
+      transform: translateY(-6px) scale(1.06);
+      box-shadow: 0 18px 38px rgba(2, 6, 10, 0.7), inset 0 -6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .color-swatch {
+        --size: 40px;
+      }
+
+      .color-palette.bottom-center {
+        bottom: 18px;
+        width: min(94vw, 700px);
+      }
+
+      .viewer-container.fullscreen .color-palette.bottom-center {
+        bottom: 18px;
+      }
+    }
+
+    /* animation */
+    @keyframes liquidFlow {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* ---------- end of CSS ---------- */
+  </style>
+  <script type="module" crossorigin src="/assets/index-Bmftf4Uu.js"></script>
 </head>
+
 <body>
-	<div class="container">
-		<div class="row justify-content-center align-items-center min-vh-100">
-			<div class="col-md-6">
-				<div class="welcome-card">
-					<img src="https://assets.vercel.com/image/upload/front/favicon/vercel/152x152.png" alt="Vercel Logo" class="vercel-logo">
-					<h1 class="mb-3">Welcome to <span class="text-primary">Vercel</span>!</h1>
-					<p class="lead mb-4">Your deployment is live.<br>Start building something amazing.</p>
-					<a href="https://vercel.com/docs" class="btn btn-dark btn-lg" target="_blank">Read the Docs</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Bootstrap JS (optional, for interactive components) -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>Kitchen Design Studio</h1>
+      <p>Experience immersive 3D kitchen visualization with real-time material customization. Design your dream kitchen
+        with our advanced interactive tools.</p>
+    </div>
+
+    <!-- 3D Viewer Container (palette moved inside) -->
+    <div class="viewer-container" id="viewerContainer">
+      <!-- Viewer Header -->
+      <div class="viewer-header">
+        <h3 class="viewer-title">3D Kitchen Visualization</h3>
+        <div class="viewer-controls">
+          <button class="control-btn fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen">
+            <span class="fullscreen-icon">⛶</span>
+          </button>
+
+          <!-- Theme toggle button -->
+          <button class="control-btn theme-toggle-btn" id="themeToggleBtn" title="Toggle light / dark theme"
+            aria-pressed="false">
+            <span class="theme-icon">🌙</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Screen -->
+      <div id="loader">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Kitchen Model</div>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three.js Container -->
+      <div id="threejs-container"></div>
+
+      <!-- Professional Material Selector -->
+      <div id="textureSelector">
+        <div class="selector-header">
+          <h3 class="selector-title">Materials</h3>
+          <button class="toggle-btn" id="toggleSelector" aria-label="Toggle materials panel">
+            <span class="icon">−</span>
+          </button>
+        </div>
+
+        <div class="selector-content">
+          <div class="category">
+            <div class="category-header">
+              <div class="category-title">Flooring</div>
+            </div>
+            <div class="texture-grid">
+              <button class="texture-btn active" data-category="floor" data-texture="1">Natural Oak</button>
+              <button class="texture-btn" data-category="floor" data-texture="2">Classic Walnut</button>
+              <button class="texture-btn" data-category="floor" data-texture="3">Modern Concrete</button>
+            </div>
+          </div>
+
+          <!-- Material target buttons -->
+          <div class="texture-grid" id="materialTargets"
+            style="margin-bottom:8px; grid-template-columns: repeat(3, 1fr);">
+            <button class="texture-btn material-target-btn active" data-target="Walls">Wall</button>
+            <button class="texture-btn material-target-btn" data-target="top_cupboard">Top Cupboard</button>
+            <button class="texture-btn material-target-btn" data-target="kitchen_table">Kitchen Table</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom-Centered Liquid-Glass Color Palette (now inside viewer) -->
+      <div class="color-palette bottom-center" id="colorPalette" aria-label="Color palette">
+        <div class="liquid-bg" aria-hidden="true"></div>
+        <div class="palette-inner">
+          <div class="palette-scroll" role="list">
+            <button class="color-swatch" style="background:#c2aa7c" aria-label="Color 1" role="listitem"
+              data-texture="4"></button>
+            <button class="color-swatch" style="background:#b06a3d" aria-label="Color 2" role="listitem"
+              data-texture="5"></button>
+            <button class="color-swatch" style="background:#c34d2e" aria-label="Color 3" role="listitem"
+              data-texture="6"></button>
+            <button class="color-swatch" style="background:#5b3a1c" aria-label="Color 4" role="listitem"
+              data-texture="7"></button>
+            <button class="color-swatch" style="background:#4a464c" aria-label="Color 5" role="listitem"
+              data-texture="8"></button>
+            <button class="color-swatch" style="background:#b37f2f" aria-label="Color 6" role="listitem"
+              data-texture="9"></button>
+            <button class="color-swatch" style="background:#aaaaaa" aria-label="Color 7" role="listitem"
+              data-texture="10"></button>
+            <button class="color-swatch" style="background:#fcd37a" aria-label="Color 8" role="listitem"
+              data-texture="11"></button>
+            <button class="color-swatch" style="background:#4a3f35" aria-label="Color 9" role="listitem"
+              data-texture="12"></button>
+            <button class="color-swatch" style="background:#5c6e58" aria-label="Color 10" role="listitem"
+              data-texture="13"></button>
+            <button class="color-swatch" style="background:#ffffff" aria-label="Color 11" role="listitem"
+              data-texture="14"></button>
+            <button class="color-swatch" style="background:#7d7469" aria-label="Color 12" role="listitem"
+              data-texture="15"></button>
+            <button class="color-swatch" style="background:#e7dbc6" aria-label="Color 13" role="listitem"
+              data-texture="16"></button>
+            <button class="color-swatch" style="background:#e9a3b3" aria-label="Color 14" role="listitem"
+              data-texture="17"></button>
+            <button class="color-swatch" style="background:#c74f4f" aria-label="Color 15" role="listitem"
+              data-texture="18"></button>
+            <button class="color-swatch" style="background:#8a6c92" aria-label="Color 16" role="listitem"
+              data-texture="19"></button>
+            <button class="color-swatch" style="background:#4769c9" aria-label="Color 17" role="listitem"
+              data-texture="20"></button>
+            <button class="color-swatch" style="background:#111111" aria-label="Color 18" role="listitem"
+              data-texture="21"></button>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- end viewer-container -->
+
+    <div class="features">
+      <div class="feature-card">
+        <h3>Material Controls</h3>
+        <p>Use the bottom palette to quickly set wall colors. Use the panel on the right for textures.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Export</h3>
+        <p>Export snapshots or save design presets (coming soon).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- main.js module (app logic) -->
 </body>
+
 </html>
